@@ -15,7 +15,8 @@ SRC = ./src/main.c
 
 all:
 	$(CC) $(CCFLAGS) $(INCFLAGS) -c $(SRC) -o ./src/main.o
-	$(CC) ./src/main.o $(LDFLAGS) -o ./bin/main
+	$(CC) $(CCFLAGS) $(INCFLAGS) -c ./src/loop.c -o src/loop.o
+	$(CC) ./src/main.o ./src/loop.o $(LDFLAGS) -o ./bin/main
 
 lib_sdl:
 	cd ./lib/SDL && cmake -S . -B $(_SDL_BUILD_DIR)
