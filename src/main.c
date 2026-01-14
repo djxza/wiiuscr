@@ -114,6 +114,9 @@ int main(void) {
   scr.properties.width = WIDTH;
   scr.properties.height = HEIGHT;
 
+  // init all the shit to prepare for the loop ahaaaaaaaaaaaaa
+  init();
+
   while (state.win.running) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
@@ -131,6 +134,8 @@ int main(void) {
 
     render(&state.ren);
   }
+
+  kill();
 
   kill_state(&state);
   kill_sdl();

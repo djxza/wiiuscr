@@ -2,11 +2,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define USE_SDL3
 
 #ifdef USE_SDL3
 
+#include <SDL3/SDL.h>
 #include <SDL3/SDL_oldnames.h>
 
 #define KEY_A SDL_SCANCODE_A
@@ -61,9 +63,25 @@
 #define KEY_LEFT SDL_SCANCODE_LEFT
 #define KEY_RIGHT SDL_SCANCODE_RIGHT
 
+#define KEY_COUNT SDL_SCANCODE_COUNT
+
 #endif // USE_SDL3
 
-#define cerr(...) fprintf(stderr, __VA_ARGS__)
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+
+#define cerr(...)                                                              \
+  do {                                                                         \
+    fprintf(stderr, ANSI_COLOR_RESET);                                         \
+    fprintf(stderr, __VA_ARGS__);                                              \
+    fprintf(stderr, "%s\n", ANSI_COLOR_RESET);                                 \
+  } while (0)
+
 #define ASSERT(expr, ...)                                                      \
   if (!(expr)) {                                                               \
     cerr(__VA_ARGS__);                                                         \
@@ -109,5 +127,6 @@ typedef struct {
 
 usize vec_to_idx(u2 p, s2 prop);
 void put_pixel(u2 p, u32 col, screen_t *ps);
-void put_pixel(u2 p, u32 col, screen_t *ps);
+void init();
+void kill();
 void loop(screen_t *ps, const bool *keys);
