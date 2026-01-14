@@ -224,7 +224,64 @@ void init_apps() {
 
 void init_tiles() { cp_img(&tile, "./res/gfx/tile.png"); }
 
-void draw_tile(int x, int y, screen_t *ps) { draw_img((u2){x, y}, &tile, ps); }
+void draw_tile(int w, int h, int x, int y, screen_t *ps) {
+  ASSERT(tile.pixels != NULL, "Tile texture not loaded");
+
+  if (w <= 0 || h <= 0)
+    return;
+
+  float scale_x = (float)tile.size.width / (float)w;
+  float scale_y = (float)tile.size.height / (float)h;
+
+  int start_x = x;
+  int start_y = y;
+  int end_x = x + w;
+  int end_y = y + h;
+
+  if (start_x >= ps->properties.width || start_y >= ps->properties.height)
+    return;
+
+  if (end_x > ps->properties.width)
+    end_x = ps->properties.width;
+  if (end_y > ps->properties.height)
+    end_y = ps->properties.height;
+  if (start_x < 0)
+    start_x = 0;
+  if (start_y < 0)
+    start_y = 0;
+
+  for (int dy = start_y; dy < end_y; ++dy) {
+    for (int dx = start_x; dx < end_x; ++dx) {
+
+      int local_x = dx - x;
+      int local_y = dy - y;
+
+      int src_x = (int)(local_x * scale_x);
+      int src_y = (int)(local_y * scale_y);
+
+      if (src_x < 0)
+        src_x = 0;
+      if (src_y < 0)
+        src_y = 0;
+      if (src_x >= tile.size.width)
+        src_x = tile.size.width - 1;
+      if (src_y >= tile.size.height)
+        src_y = tile.size.height - 1;
+
+      usize src_idx = src_y * tile.size.width + src_x;
+      u32 src_pixel = tile.pixels[src_idx];
+
+      if (get_a(src_pixel) == 0)
+        continue;
+
+      usize dst_idx = dy * ps->properties.width + dx;
+
+      ps->pixels[dst_idx] = (get_a(src_pixel) == 255)
+                                ? src_pixel
+                                : alpha_blend(src_pixel, ps->pixels[dst_idx]);
+    }
+  }
+}
 
 void draw_tiles(screen_t *ps) {
   init_apps();
@@ -232,7 +289,8 @@ void draw_tiles(screen_t *ps) {
 
   for (int x = 0; x < apps.cols; ++x) {
     for (int y = 0; y < apps.rows; ++y) {
-      draw_tile(200 * x + 40, 200 * y + 40, ps);
+      draw_tile(80, 80, 200 * x + 40, 200 * y + 40, ps);
+      draw_tile(40, 40, 200 * x + 80, 200 * y + 90, ps);
     }
   }
 }
